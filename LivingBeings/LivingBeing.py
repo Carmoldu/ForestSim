@@ -66,10 +66,39 @@ class LivingBeing:
         return self.reproduce_behaviour.reproduce()
 
 
+class Lumberjack(LivingBeing):
+    default_monthly_energy = 3
+    lumber = 0
+
+    def __init__(self, position: tuple):
+        super().__init__(position,
+                         move_behaviour=IMove.CanMove(self),
+                         reproduce_behaviour=IReproduce.NoReproduction(self),
+                         kill_behaviour=IKill.DoKill(self),
+                         display_behaviour=IDisplay.LumberjackDisplay(),
+                         monthly_energy=self.default_monthly_energy)
 
 
+class Bear(LivingBeing):
+    default_monthly_energy = 5
+    kills = 0
+
+    def __init__(self, position: tuple):
+        super().__init__(position,
+                         move_behaviour=IMove.CanMove(self),
+                         reproduce_behaviour=IReproduce.NoReproduction(self),
+                         kill_behaviour=IKill.DoKill(self),
+                         display_behaviour=IDisplay.BearDisplay(),
+                         monthly_energy=self.default_monthly_energy)
 
 
+class Tree(LivingBeing):
+    default_monthly_energy = 0
 
-
-
+    def __init__(self, position: tuple):
+        super().__init__(position,
+                         move_behaviour=IMove.CannotMove(self),
+                         reproduce_behaviour=IReproduce.Asexually(self),
+                         kill_behaviour=IKill.DoNotKill(self),
+                         display_behaviour=IDisplay.TreeDisplay(),
+                         monthly_energy=self.default_monthly_energy)
