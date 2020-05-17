@@ -1,35 +1,30 @@
 import numpy as np
-import Trees, Bears, Lumberjacks
+from LivingBeings import LivingBeing
 
 
 class Forest:
     initDefaultOptions = {"initial_percentage_lumberjacks": 0.1,
                           "initial_percentage_trees": 0.5,
-                          "initial_percentage_bears": 0.2}
+                          "initial_percentage_bears": 0.02}
 
-    def __init__(self, height: int = 20, width: int = 20, options=initDefaultOptions):
+    def __init__(self, height: int = 20, width: int = 20,
+                 options=initDefaultOptions,
+                 living_being=LivingBeing.LivingBeing):
+
+        living_being.set_forest(self)
+
         self.grid = np.empty(shape=(height, width), dtype='object')
         self.height = height
         self.width = width
 
-        number_of_cells = height * width
-        number_of_trees = int(number_of_cells * options["initial_percentage_trees"])
-        number_of_lumberjacks = int(number_of_cells * options["initial_percentage_lumberjacks"])
-        number_of_bears = int(number_of_cells * options["initial_percentage_bears"])
+        number_of_trees = int(self.grid.size * options["initial_percentage_trees"])
+        number_of_lumberjacks = int(self.grid.size * options["initial_percentage_lumberjacks"])
+        number_of_bears = int(self.grid.size * options["initial_percentage_bears"])
 
-        empty_cells = self.get_empty_cells()
+        LivingBeing.Tree.spawn_in_empty_space(number_of_trees)
+        LivingBeing.Lumberjack.spawn_in_empty_space(number_of_lumberjacks)
+        LivingBeing.Bear.spawn_in_empty_space(number_of_bears)
 
-        for tree_spawn in range(number_of_trees):
-            tree_position = empty_cells.pop(np.random.randint(0, len(empty_cells), 1)[0])
-            self.grid[tree_position] = Trees.Tree(position=tree_position)
-
-        for lumberjack_spawn in range(number_of_lumberjacks):
-            lumberjack_position = empty_cells.pop(np.random.randint(0, len(empty_cells), 1)[0])
-            self.grid[lumberjack_position] = Lumberjacks.Lumberjack()
-
-        for bear_spawn in range(number_of_bears):
-            bear_position = empty_cells.pop(np.random.randint(0, len(empty_cells), 1)[0])
-            self.grid[bear_position] = Bears.Bear()
 
     def get_empty_cells(self, around=None):
         if around is None:
@@ -55,7 +50,7 @@ class Forest:
                 if element is not None:
                     display_string += element.display()
                 else:
-                    display_string += '.'
+                    display_string += '.  '
 
             display_string += '\n'
 
