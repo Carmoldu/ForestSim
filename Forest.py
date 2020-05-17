@@ -25,23 +25,27 @@ class Forest:
         LivingBeing.Lumberjack.spawn_in_empty_space(number_of_lumberjacks)
         LivingBeing.Bear.spawn_in_empty_space(number_of_bears)
 
-
-    def get_empty_cells(self, around=None):
+    def get_cells_with(self, object=None, around: tuple=None):
         if around is None:
-            return [(y, x) for y in range(self.height) for x in range(self.width) if self.grid[y, x] is None]
+            return [(y, x) for y in range(self.height) for x in range(self.width) if self.grid[y, x] is object]
 
         else:
-            assert around[0] < self.height, "Row number must be lower than grid height! Remember numbering starts at 0"
-            assert around[1] < self.width, "Column number must be lower than grid width! Remember numbering starts at 0"
+            surrounding_cells = self.get_cells_around(around)
 
-            min_row = around[0] - 1 if around[0] > 0 else 0
-            max_row = around[0] + 1 if around[0] < self.height - 1 else self.height - 1
+            return[cell for cell in surrounding_cells if self.grid[cell] is object]
 
-            min_column = around[1] - 1 if around[1] > 0 else 0
-            max_column = around[1] + 1 if around[1] < self.width - 1 else self.width - 1
+    def get_cells_around(self, around: tuple):
+        assert around[0] < self.height, "Row number must be lower than grid height! Remember numbering starts at 0"
+        assert around[1] < self.width, "Column number must be lower than grid width! Remember numbering starts at 0"
 
-            return[(y, x) for y in range(min_row, max_row+1) for x in range(min_column, max_column+1)
-                   if self.grid[y, x] is None and (y, x) != around]
+        min_row = around[0] - 1 if around[0] > 0 else 0
+        max_row = around[0] + 1 if around[0] < self.height - 1 else self.height - 1
+
+        min_column = around[1] - 1 if around[1] > 0 else 0
+        max_column = around[1] + 1 if around[1] < self.width - 1 else self.width - 1
+
+        return [(y, x) for y in range(min_row, max_row + 1) for x in range(min_column, max_column + 1)
+                if (y, x) != around]
 
     def display_grid(self):
         display_string = ''
