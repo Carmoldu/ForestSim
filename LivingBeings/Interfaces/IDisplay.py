@@ -16,17 +16,17 @@ class IDisplay:
 
 class LumberjackDisplay(IDisplay):
     def display(self):
-        return PrintColors.PURPLE + "L" + PrintColors.ENDC + "  "
+        return PrintColors.PURPLE + "L" + PrintColors.ENDC
         #return "L"
 
 
 class TreeDisplay(IDisplay):
     def display(self):
-        return PrintColors.GREEN + "T" + PrintColors.ENDC + "  "
+        return PrintColors.GREEN + "T" + PrintColors.ENDC
         #return "T"
 
 
 class BearDisplay(IDisplay):
     def display(self):
-        return PrintColors.RED + "B" + PrintColors.ENDC + "  "
+        return PrintColors.RED + "B" + PrintColors.ENDC
         #return "B"
