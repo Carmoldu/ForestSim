@@ -1,9 +1,8 @@
 from numpy import random
 import warnings
-from LivingBeings.Interfaces.IDisplay import PrintColors as textColor
+from LivingBeings.PrintColors import PrintColors as textColor
 
 import Forest
-from LivingBeings.Interfaces import IMove, IKill, IDisplay, IReproduce
 
 
 class LivingBeing:
@@ -12,38 +11,35 @@ class LivingBeing:
     alive = []
 
     def __init__(self, position: tuple,
-                 move_behaviour: IMove.IMove = None,
-                 reproduce_behaviour: IReproduce.IReproduce = None,
-                 kill_behaviour: IKill.IKill = None,
-                 display_behaviour: IDisplay.IDisplay = None,
                  monthly_energy: int = default_monthly_energy):
 
         self.age = 0
         self.position = position
         self.monthly_energy = monthly_energy
-        self.energy = 0
-
-        self.move_behaviour = move_behaviour
-        self.reproduce_behaviour = reproduce_behaviour
-        self.kill_behaviour = kill_behaviour
-        self.display_behaviour = display_behaviour
+        self.energy = monthly_energy
 
         LivingBeing.alive.append(self)
 
     def recover(self):
-        self.energy = self.monthly_energy
+        self.energy = self.default_monthly_energy
 
     def move(self):
-        return self.move_behaviour.move()
+        if self.energy <= 0:
+            return
+
+        cells_around = LivingBeing.forest.get_cells_around(self.position)
+        cell_to_move = cells_around[random.randint(0, len(cells_around), 1)[0]]
+        LivingBeing.forest.move_living_being(self, cell_to_move)
+        self.energy -= 1
 
     def kill(self):
-        return self.kill_behaviour.kill()
+        pass
 
     def display(self):
-        return self.display_behaviour.display()
+        pass
 
     def reproduce(self):
-        return self.reproduce_behaviour.reproduce()
+        pass
 
     @classmethod
     def set_forest(cls, forest: Forest):
@@ -72,13 +68,11 @@ class Lumberjack(LivingBeing):
     alive = []
 
     def __init__(self, position: tuple):
-        super().__init__(position,
-                         move_behaviour=IMove.CanMove(self),
-                         reproduce_behaviour=IReproduce.NoReproduction(self),
-                         kill_behaviour=IKill.DoKill(self),
-                         display_behaviour=IDisplay.LumberjackDisplay(),
-                         monthly_energy=self.default_monthly_energy)
+        super().__init__(position, monthly_energy=self.default_monthly_energy)
         Lumberjack.alive.append(self)
+
+    def display(self):
+        return textColor.PURPLE + "L" + textColor.ENDC
 
 
 class Bear(LivingBeing):
@@ -87,13 +81,11 @@ class Bear(LivingBeing):
     alive = []
 
     def __init__(self, position: tuple):
-        super().__init__(position,
-                         move_behaviour=IMove.CanMove(self),
-                         reproduce_behaviour=IReproduce.NoReproduction(self),
-                         kill_behaviour=IKill.DoKill(self),
-                         display_behaviour=IDisplay.BearDisplay(),
-                         monthly_energy=self.default_monthly_energy)
+        super().__init__(position, monthly_energy=self.default_monthly_energy)
         Bear.alive.append(self)
+
+    def display(self):
+        return textColor.RED + "B" + textColor.ENDC
 
 
 class Tree(LivingBeing):
@@ -101,10 +93,14 @@ class Tree(LivingBeing):
     alive = []
 
     def __init__(self, position: tuple):
-        super().__init__(position,
-                         move_behaviour=IMove.CannotMove(self),
-                         reproduce_behaviour=IReproduce.Asexually(self),
-                         kill_behaviour=IKill.DoNotKill(self),
-                         display_behaviour=IDisplay.TreeDisplay(),
-                         monthly_energy=self.default_monthly_energy)
+        super().__init__(position, monthly_energy=self.default_monthly_energy)
         Tree.alive.append(self)
+
+    def display(self):
+        return textColor.GREEN + "T" + textColor.ENDC
+
+    def kill(self):
+        return
+
+    def move(self):
+        return
