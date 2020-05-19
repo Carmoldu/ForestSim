@@ -1,9 +1,11 @@
 from LivingBeings import LivingBeing, Lumberjack, Bear
 from LivingBeings.PrintColors import PrintColors as textColor
+from numpy import random
 
 
 class Tree(LivingBeing.LivingBeing):
     default_monthly_energy = 0
+    reproduction_chance = 0.1
     alive = []
 
     def __init__(self, position: tuple):
@@ -18,3 +20,7 @@ class Tree(LivingBeing.LivingBeing):
 
     def move(self):
         return
+
+    def reproduce(self):
+        if random.rand() < self.reproduction_chance:
+            super().reproduce(self.position)

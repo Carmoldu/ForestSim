@@ -46,12 +46,12 @@ class LivingBeing:
 
         return has_killed
 
-
     def display(self):
         pass
 
-    def reproduce(self):
-        pass
+    def reproduce(self, around: (int, int) = None):
+        print(f"A {type(self).__name__} is reproducing!")
+        self.spawn_in_empty_space(1, around)
 
     @classmethod
     def set_forest(cls, forest: Forest):
@@ -62,6 +62,10 @@ class LivingBeing:
         print(textColor.GREEN + f"Trying to create {quantity} {cls.__name__} around {around}." + textColor.ENDC)
 
         empty_cells = cls.forest.get_cells_with(None, around)
+
+        if not empty_cells:
+            print("\tNo space to spawn!")
+            return
 
         if quantity > len(empty_cells):
             quantity = len(empty_cells)
