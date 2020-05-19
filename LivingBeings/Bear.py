@@ -21,3 +21,19 @@ class Bear(LivingBeing.LivingBeing):
 
     def display(self):
         return textColor.RED + "B" + textColor.ENDC
+
+    @classmethod
+    def reset_kills(cls):
+        cls.kills = 0
+
+    @classmethod
+    def introduce_or_expel(cls):
+        if cls.kills > 0:
+            expelled_bear = cls.select_random_alive()
+            print(f"Bear at {expelled_bear.position} has been expelled")
+            cls.died(expelled_bear)
+        else:
+            print("A new bear has entered the map!")
+            cls.spawn_in_empty_space()
+
+        cls.kills = 0

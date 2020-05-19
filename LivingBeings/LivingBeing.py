@@ -41,7 +41,7 @@ class LivingBeing:
             if (living_being is not self) and (type(living_being) in self.can_kill):
                 type(living_being).died(living_being)
                 self.energy = 0
-                print(f"{type(self).__name__} killed a {type(living_being).__name__} at {self.position}")
+                # print(f"{type(self).__name__} killed a {type(living_being).__name__} at {self.position}")
                 has_killed = True
 
         return has_killed
@@ -49,33 +49,28 @@ class LivingBeing:
     def display(self):
         pass
 
-    def reproduce(self, around: (int, int) = None):
-        print(f"A {type(self).__name__} is reproducing!")
-        self.spawn_in_empty_space(1, around)
-
     @classmethod
     def set_forest(cls, forest: Forest):
         cls.forest = forest
 
     @classmethod
-    def spawn_in_empty_space(cls, quantity, around: (int, int) = None):
-        print(textColor.GREEN + f"Trying to create {quantity} {cls.__name__} around {around}." + textColor.ENDC)
-
+    def spawn_in_empty_space(cls, quantity=1, around: (int, int) = None):
+        # print(textColor.GREEN + f"Trying to create {quantity} {cls.__name__} around {around}." + textColor.ENDC)
         empty_cells = cls.forest.get_cells_with(None, around)
 
         if not empty_cells:
-            print("\tNo space to spawn!")
+            # print("\tNo space to spawn!")
             return
 
         if quantity > len(empty_cells):
             quantity = len(empty_cells)
-            warnings.warn(f"Not enough empty spaces, reducing quantity to {len(empty_cells)}")
+            # warnings.warn(f"Not enough empty spaces, reducing quantity to {len(empty_cells)}")
 
         for spawn in range(quantity):
             spawn_position = empty_cells.pop(random.randint(0, len(empty_cells), 1)[0])
             cls.forest.grid[spawn_position] = [cls(position=spawn_position)]
 
-        print(textColor.GREEN + "\tCreated!" + textColor.ENDC)
+        # print(textColor.GREEN + "\tCreated!" + textColor.ENDC)
 
     @classmethod
     def died(cls, living_being):
@@ -83,5 +78,10 @@ class LivingBeing:
         cls.alive.remove(living_being)
         if living_being in LivingBeing.alive:
             LivingBeing.alive.remove(living_being)
+
+    @classmethod
+    def select_random_alive(cls):
+        return cls.alive[random.randint(len(cls.alive))]
+
 
 

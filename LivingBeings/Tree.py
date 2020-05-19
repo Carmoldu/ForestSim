@@ -23,4 +23,4 @@ class Tree(LivingBeing.LivingBeing):
 
     def reproduce(self):
         if random.rand() < self.reproduction_chance:
-            super().reproduce(self.position)
+            self.spawn_in_empty_space(1, self.position)
