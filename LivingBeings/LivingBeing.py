@@ -9,8 +9,9 @@ class LivingBeing:
     default_monthly_energy = 0
     forest = None  # Set up to store forest reference. It will be needed for LivingBeing interaction with the world
     alive = []
+    can_kill = {}
 
-    def __init__(self, position: tuple,
+    def __init__(self, position: (int, int),
                  monthly_energy: int = default_monthly_energy):
 
         self.age = 0
@@ -33,7 +34,18 @@ class LivingBeing:
         self.energy -= 1
 
     def kill(self):
-        pass
+        has_killed = False
+
+        living_beings_in_cell = LivingBeing.forest.grid[self.position]
+        for living_being in living_beings_in_cell:
+            if (living_being is not self) and (type(living_being) in self.can_kill):
+                type(living_being).died(living_being)
+                self.energy = 0
+                print(f"{type(self).__name__} killed a {type(living_being).__name__} at {self.position}")
+                has_killed = True
+
+        return has_killed
+
 
     def display(self):
         pass
@@ -46,7 +58,7 @@ class LivingBeing:
         cls.forest = forest
 
     @classmethod
-    def spawn_in_empty_space(cls, quantity, around: tuple = None):
+    def spawn_in_empty_space(cls, quantity, around: (int, int) = None):
         print(textColor.GREEN + f"Trying to create {quantity} {cls.__name__} around {around}." + textColor.ENDC)
 
         empty_cells = cls.forest.get_cells_with(None, around)
@@ -61,46 +73,11 @@ class LivingBeing:
 
         print(textColor.GREEN + "\tCreated!" + textColor.ENDC)
 
-
-class Lumberjack(LivingBeing):
-    default_monthly_energy = 3
-    lumber = 0
-    alive = []
-
-    def __init__(self, position: tuple):
-        super().__init__(position, monthly_energy=self.default_monthly_energy)
-        Lumberjack.alive.append(self)
-
-    def display(self):
-        return textColor.PURPLE + "L" + textColor.ENDC
+    @classmethod
+    def died(cls, living_being):
+        LivingBeing.forest.grid[living_being.position].remove(living_being)
+        cls.alive.remove(living_being)
+        if living_being in LivingBeing.alive:
+            LivingBeing.alive.remove(living_being)
 
 
-class Bear(LivingBeing):
-    default_monthly_energy = 5
-    kills = 0
-    alive = []
-
-    def __init__(self, position: tuple):
-        super().__init__(position, monthly_energy=self.default_monthly_energy)
-        Bear.alive.append(self)
-
-    def display(self):
-        return textColor.RED + "B" + textColor.ENDC
-
-
-class Tree(LivingBeing):
-    default_monthly_energy = 0
-    alive = []
-
-    def __init__(self, position: tuple):
-        super().__init__(position, monthly_energy=self.default_monthly_energy)
-        Tree.alive.append(self)
-
-    def display(self):
-        return textColor.GREEN + "T" + textColor.ENDC
-
-    def kill(self):
-        return
-
-    def move(self):
-        return

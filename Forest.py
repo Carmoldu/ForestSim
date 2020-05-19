@@ -1,6 +1,6 @@
 import numpy as np
 import warnings
-from LivingBeings import LivingBeing
+from LivingBeings import LivingBeing, Tree, Bear, Lumberjack
 
 
 class Forest:
@@ -31,9 +31,9 @@ class Forest:
         if number_of_bears == 0 and options["initial_percentage_bears"] != 0:
             number_of_bears = 1
 
-        LivingBeing.Tree.spawn_in_empty_space(number_of_trees)
-        LivingBeing.Lumberjack.spawn_in_empty_space(number_of_lumberjacks)
-        LivingBeing.Bear.spawn_in_empty_space(number_of_bears)
+        Tree.Tree.spawn_in_empty_space(number_of_trees)
+        Lumberjack.Lumberjack.spawn_in_empty_space(number_of_lumberjacks)
+        Bear.Bear.spawn_in_empty_space(number_of_bears)
 
     def get_cells_with(self, object=None, around: tuple = None):
         if around is None:
@@ -55,7 +55,7 @@ class Forest:
         assert cell_position[1] >= 0, \
             "Column number must be 0 or higher!"
 
-    def get_cells_around(self, around: tuple):
+    def get_cells_around(self, around: (int, int)):
         self.check_cell_in_forest_bounds(around)
 
         min_row = around[0] - 1 if around[0] > 0 else 0
@@ -67,7 +67,7 @@ class Forest:
         return [(y, x) for y in range(min_row, max_row + 1) for x in range(min_column, max_column + 1)
                 if (y, x) != around]
 
-    def move_living_being(self, living_being: LivingBeing.LivingBeing, destination_cell: tuple):
+    def move_living_being(self, living_being: LivingBeing.LivingBeing, destination_cell: (int, int)):
         self.check_cell_in_forest_bounds(destination_cell)
 
         # Take out object from original cell. Set cell to None if empty
@@ -88,7 +88,7 @@ class Forest:
 
         living_being.position = destination_cell
 
-    def get_living_beings_alive_list(self, living_being: LivingBeing = LivingBeing):
+    def get_living_beings_alive_list(self, living_being: LivingBeing = LivingBeing.LivingBeing):
         return living_being.alive
 
     def display_grid(self):
