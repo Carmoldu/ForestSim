@@ -118,26 +118,56 @@ class GameCycle:
             self.advance_to_next_tick(display=False)
 
         if display:
-            self.display_current_time()
-            self.forest.display_grid()
-            OutputUtilities.PrintPrefabs.population()
-            OutputUtilities.PrintPrefabs.resources()
+            self.display_grid_and_info()
 
     def advance_to_next_year(self, display=True):
         for month in range(self.current_month, self.default_months_per_year):
             self.advance_to_next_month(display=False)
 
         if display:
-            self.display_current_time()
-            self.forest.display_grid()
-            OutputUtilities.PrintPrefabs.population()
-            OutputUtilities.PrintPrefabs.resources()
+            self.display_grid_and_info()
+
+    def advance_x_years(self, years: int, display=True):
+        end_month = self.current_month
+        end_tick = self.current_tick
+
+        for a in range(years):
+            self.advance_to_next_year(False)
+
+        self.advance_x_months(end_month, False)
+        self.advance_x_ticks(end_tick, False)
+
+        if display:
+            self.display_grid_and_info()
+
+    def advance_x_months(self, months: int, display=True):
+        end_tick = self.current_tick
+
+        for a in range(months):
+            self.advance_to_next_month(False)
+        self.advance_x_ticks(end_tick, False)
+
+        if display:
+            self.display_grid_and_info()
+
+    def advance_x_ticks(self, ticks: int, display=True):
+        for a in range(ticks):
+            self.advance_to_next_tick(False)
+
+        if display:
+            self.display_grid_and_info()
 
     def display_current_time(self):
         print(f"Tick: {self.current_tick}\t"
               f"Month: {self.current_month}\t"
               f"Year: {self.current_year}\t"
               f"Total ticks: {self.tick_count}")
+
+    def display_grid_and_info(self):
+        self.display_current_time()
+        self.forest.display_grid()
+        OutputUtilities.PrintPrefabs.population()
+        OutputUtilities.PrintPrefabs.resources()
 
     def plot_population_history(self, years_to_display=None, until_year=None, display_months=True, display_years=True):
         if until_year is None:
@@ -178,5 +208,5 @@ class GameCycle:
                        label="Years")
 
         plt.grid(which="minor")
-        plt.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
+        plt.legend()
         plt.show()

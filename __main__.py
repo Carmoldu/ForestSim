@@ -1,5 +1,4 @@
 import GameCycle
-import matplotlib.pyplot as plt
 
 
 if __name__ == "__main__":
@@ -27,9 +26,5 @@ if __name__ == "__main__":
         else:
             print("Input not accepted")
 
-    plt.plot(game.population_history["Ticks"], game.population_history["Tree"],
-             game.population_history["Ticks"], game.population_history["Lumberjack"],
-             game.population_history["Ticks"], game.population_history["Bear"])
-    plt.legend(["Trees", "Lumberjacks", "Bears"])
-    plt.show()
+    game.plot_population_history()
 
