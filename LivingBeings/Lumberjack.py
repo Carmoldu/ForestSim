@@ -28,7 +28,7 @@ class Lumberjack(LivingBeing.LivingBeing):
 
     @classmethod
     def hire_or_fire_lumberjacks(cls):
-        if cls.lumber > len(cls.alive):
+        if cls.lumber > len(cls.alive) > 0:
             lumberjacks_hired = cls.lumber // len(cls.alive)
             print(f"{lumberjacks_hired} have been hired!")
             cls.spawn_in_empty_space(lumberjacks_hired)
@@ -38,6 +38,10 @@ class Lumberjack(LivingBeing.LivingBeing):
                 fired_lumberjack = cls.select_random_alive()
                 print(f"Lumberjack at {fired_lumberjack.position} has been fired!")
                 cls.died(fired_lumberjack)
+
+            else:
+                cls.spawn_in_empty_space(1)
+
 
         cls.lumber = 0
 
