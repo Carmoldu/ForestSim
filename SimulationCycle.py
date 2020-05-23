@@ -4,7 +4,7 @@ import random
 import matplotlib.pyplot as plt
 
 
-class GameCycle:
+class SimulationCycle:
     default_ticks_per_month = 5
     default_months_per_year = 12
     default_forest_initialization = {"initial_percentage_lumberjacks": 0.1,
