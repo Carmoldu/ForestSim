@@ -76,7 +76,6 @@ class Button:
         '''if self.over and self.button_description is not None:
             self.display_surface.blit(self.description_surface, self.description_RectObj)'''
 
-
     def coordinate_is_over_button(self, coordinates: (int, int)):
         if self.button_rectObj.right > coordinates[0] > self.button_rectObj.left \
                 and self.button_rectObj.top < coordinates[1] < self.button_rectObj.bottom:
