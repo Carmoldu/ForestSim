@@ -175,7 +175,10 @@ class Graph:
 
     def draw(self, data: dict):
         for key in data.keys():
-            self.ax.plot(data[key]['x'], data[key]['y'], data[key]['style'])
+            if data[key]["orient"] == "v":
+                self.ax.vlines(data[key]["x"], [0] * len(data[key]["x"]), data[key]["y"], linestyles=data[key]["style"])
+            else:
+                self.ax.plot(data[key]['x'], data[key]['y'], data[key]['style'])
         self.canvas.draw()
         renderer = self.canvas.get_renderer()
 
@@ -183,6 +186,9 @@ class Graph:
         size = self.canvas.get_width_height()
 
         self.display_surface.blit(pygame.image.fromstring(raw_data, size, "RGB"), self.position)
+
+    def clear(self):
+        self.ax.clear()
 
 
 if __name__ == "__main__":

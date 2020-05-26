@@ -204,12 +204,10 @@ class SimulationCycle:
         OutputUtilities.PrintPrefabs.population()
         OutputUtilities.PrintPrefabs.resources()
 
-    def plot_population_history(self,
-                                ticks_to_display: int = None,
-                                until_tick: int = None,
-                                display_months: bool = True,
-                                display_years: bool = True):
-
+    def get_idxs_of_population_history(self,
+                                       ticks_to_display: int = None,
+                                       until_tick: int = None
+                                       ):
         # if until_tick was not introduced, set last tick to be the last simulated tick
         if until_tick is None:
             last_tick_idx = -1
@@ -228,6 +226,29 @@ class SimulationCycle:
             first_tick = until_tick - ticks_to_display
             first_tick_idx = self.index_of_first_occurrence_in_list(first_tick, self.population_history["Ticks"])
 
+        # Find the first month line that should be shown
+        first_tick_idx_month = self.index_of_closest_upper_value(first_tick, self.population_history["Month"]["Ticks"])
+        last_tick_idx_month = self.index_of_closest_upper_value(until_tick, self.population_history["Month"]["Ticks"])
+
+        # Find the first month line that should be shown
+        first_tick_idx_year = self.index_of_closest_upper_value(first_tick, self.population_history["Year"]["Ticks"])
+        last_tick_idx_year = self.index_of_closest_upper_value(until_tick, self.population_history["Year"]["Ticks"])
+
+        return first_tick_idx, last_tick_idx, \
+               first_tick_idx_month, last_tick_idx_month, \
+               first_tick_idx_year, last_tick_idx_year
+
+
+    def plot_population_history(self,
+                                ticks_to_display: int = None,
+                                until_tick: int = None,
+                                display_months: bool = True,
+                                display_years: bool = True):
+
+        first_tick_idx, last_tick_idx, \
+        first_tick_idx_month, last_tick_idx_month, \
+        first_tick_idx_year, last_tick_idx_year = self.get_idxs_of_population_history(ticks_to_display, until_tick)
+
         # Plot the line plots of the populations of living beings
         plt.plot(self.population_history["Ticks"][first_tick_idx:last_tick_idx],
                  self.population_history["Tree"][first_tick_idx:last_tick_idx],
@@ -240,24 +261,15 @@ class SimulationCycle:
                  label="Bears")
 
         if display_months:
-            # Find the first month line that should be shown
-            first_tick_idx = self.index_of_closest_upper_value(first_tick, self.population_history["Month"]["Ticks"])
-            last_tick_idx = self.index_of_closest_upper_value(until_tick, self.population_history["Month"]["Ticks"])
-
-            # Plot them
-            plt.vlines(self.population_history["Month"]["Ticks"][first_tick_idx:last_tick_idx],
-                       [0] * len(self.population_history["Month"]["Ticks"][first_tick_idx:last_tick_idx]),
-                       self.population_history["Month"]["MaxPopulation"][first_tick_idx:last_tick_idx],
+            plt.vlines(self.population_history["Month"]["Ticks"][first_tick_idx_month:last_tick_idx_month],
+                       [0] * len(self.population_history["Month"]["Ticks"][first_tick_idx_month:last_tick_idx_month]),
+                       self.population_history["Month"]["MaxPopulation"][first_tick_idx_month:last_tick_idx_month],
                        linestyles="dotted", label="Months")
 
         if display_years:
-            # Find the first month line that should be shown
-            first_tick_idx = self.index_of_closest_upper_value(first_tick, self.population_history["Year"]["Ticks"])
-            last_tick_idx = self.index_of_closest_upper_value(until_tick, self.population_history["Year"]["Ticks"])
-            # Plot them
-            plt.vlines(self.population_history["Year"]["Ticks"][first_tick_idx:last_tick_idx],
-                       [0] * len(self.population_history["Year"]["Ticks"][first_tick_idx:last_tick_idx]),
-                       self.population_history["Year"]["MaxPopulation"][first_tick_idx:last_tick_idx],
+            plt.vlines(self.population_history["Year"]["Ticks"][first_tick_idx_year:last_tick_idx_year],
+                       [0] * len(self.population_history["Year"]["Ticks"][first_tick_idx_year:last_tick_idx_year]),
+                       self.population_history["Year"]["MaxPopulation"][first_tick_idx_year:last_tick_idx_year],
                        label="Years")
 
         # Graph options and show
@@ -294,4 +306,31 @@ class SimulationCycle:
                 return indx
         return None
 
+
+if __name__ == "__main__":
+
+    simulation = SimulationCycle()
+    simulation.initialize_forest()
+
+    while True:
+        user_in = input("What do you want to do? "
+                        "\n\t- [t] Advance one tick"
+                        "\n\t- [m] Advance one month"
+                        "\n\t- [y] Advance one year"
+                        "\n\t- [p] Plot current population history"
+                        "\n\t- [q] Quit")
+        if user_in == "t":
+            simulation.advance_to_next_tick()
+        elif user_in == "m":
+            simulation.advance_to_next_month()
+        elif user_in == "y":
+            simulation.advance_to_next_year()
+        elif user_in == "p":
+            simulation.plot_population_history()
+        elif user_in == "q":
+            break
+        else:
+            print("Input not accepted")
+
+    simulation.plot_population_history()
 
