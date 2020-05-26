@@ -60,6 +60,7 @@ class Camera:
         self.camera_at_bottom_limit = False
         self.zoom_in_limit = False
         self.zoom_out_limit = False
+        self.over_display = False
 
     def draw(self):
         self.update_camera_position()
@@ -156,7 +157,7 @@ class Camera:
                 self.moving_right = False
 
         if event.type == MOUSEBUTTONDOWN:
-            if self.move_with_mouse_wheel:
+            if self.move_with_mouse_wheel and self.over_display and event.button == 2:
                 self.moving = True
                 self.mouse_pos_at_click = pygame.mouse.get_pos()
                 self.position_at_click = list(self.in_camera_area.center)
@@ -171,6 +172,12 @@ class Camera:
             self.moving = False
             self.zoom_in = False
             self.zoom_out = False
+
+        if event.type == MOUSEMOTION:
+            if self.coordinate_is_over_display(pygame.mouse.get_pos()):
+                self.over_display = True
+            else:
+                self.over_display = False
 
     def camera_is_moving(self):
         return self.moving_down or self.moving_left or self.moving_right or self.moving_right or self.moving_up \
@@ -213,6 +220,12 @@ class Camera:
             self.zoom_out_limit = True
         else:
             self.zoom_out_limit = False
+
+    def coordinate_is_over_display(self, coordinates: (int, int)):
+        if self.subdisplay_surface.get_rect().right > coordinates[0] > self.subdisplay_surface.get_rect().left \
+                and self.subdisplay_surface.get_rect().top < coordinates[1] < self.subdisplay_surface.get_rect().bottom:
+            return True
+        return False
 
 
 

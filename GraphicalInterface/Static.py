@@ -77,12 +77,12 @@ class Button:
             self.display_surface.blit(self.description_surface, self.description_RectObj)'''
 
     def coordinate_is_over_button(self, coordinates: (int, int)):
-        if self.button_rectObj.right > coordinates[0] > self.button_rectObj.left \
-                and self.button_rectObj.top < coordinates[1] < self.button_rectObj.bottom:
+        if self.button_rectObj.right > coordinates[0] - self.position[0] > self.button_rectObj.left \
+                and self.button_rectObj.top < coordinates[1] - + self.position[1] < self.button_rectObj.bottom:
             return True
         return False
 
-    def on_event(self, event):
+    def on_event(self, event, function_args=[]):
         if event.type == MOUSEMOTION:
             if self.coordinate_is_over_button(pygame.mouse.get_pos()):
                 self.over = True
@@ -91,7 +91,7 @@ class Button:
 
         if event.type == MOUSEBUTTONDOWN and self.over:
             self.pressed = True
-            self.linked_function()
+            self.linked_function(*function_args)
         else:
             self.pressed = False
 
@@ -193,7 +193,7 @@ if __name__ == "__main__":
     DISPLAYSURF.fill(RGBColors.White)
 
     def button_clicked():
-        print("Clicked!")
+        print(f"String")
 
     button1 = Button(button_clicked,
                      DISPLAYSURF, (30, 30),
@@ -216,13 +216,11 @@ if __name__ == "__main__":
         data["Banana"]["y"].append(pygame.time.get_ticks()*2/1000)
         data["Potato"]["y"].append(pygame.time.get_ticks()/1000)
 
-        print(pygame.time.get_ticks())
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-            button1.on_event(event)
+            button1.on_event(event, [])
             scrollbar1.on_event(event)
         DISPLAYSURF.fill(RGBColors.White)
         button1.draw()
@@ -230,5 +228,4 @@ if __name__ == "__main__":
         graph1.draw(data)
         pygame.display.update()
         clock.tick(30)
-        print(clock)
 

@@ -40,6 +40,12 @@ class Grid:  # Grid is presented in isometric view, hence tile image should be i
                 draw_position = [draw_position[0] + self.tile_width / 2, draw_position[1] + self.tile_height / 2]
             draw_position = [row[0][0] - self.tile_width / 2, row[0][1] + self.tile_height / 2]
 
+    @classmethod
+    def compute_grid_pixel_size(cls, tiles: (int, int), source_image: str):
+        tile_pixel_size = pygame.image.load(source_image).get_rect().size
+        return ((int((tiles[0]+tiles[1])/2 + 1) * tile_pixel_size[0]),
+                (int((tiles[0]+tiles[1])/2 + 1) * tile_pixel_size[1]))
+
 
 if __name__ == "__main__":
     pygame.init()
