@@ -24,50 +24,66 @@ class GUI:
                                                        )
 
         self.grid = GraphicalInterface.Grid.Grid(self.camera.scene_surface, grid_size, main_folder + '/Grid/tile.png')
-        self.button_tick = GraphicalInterface.Static.Button(tick_function,
-                                                            self.display_surf, (270, 500),
-                                                            main_folder + "/StaticSource/button_tick.png",
-                                                            main_folder + "/StaticSource/button_tick_over.png",
-                                                            main_folder + "/StaticSource/button_tick_click.png")
 
-        self.button_month = GraphicalInterface.Static.Button(month_function,
-                                                             self.display_surf, (370, 500),
-                                                             main_folder + "/StaticSource/button_month.png",
-                                                             main_folder + "/StaticSource/button_month_over.png",
-                                                             main_folder + "/StaticSource/button_month_click.png")
-
-        self.button_year = GraphicalInterface.Static.Button(year_function,
-                                                            self.display_surf, (470, 500),
-                                                            main_folder + "/StaticSource/button_year.png",
-                                                            main_folder + "/StaticSource/button_year_over.png",
-                                                            main_folder + "/StaticSource/button_year_click.png")
+        self.button_play_pause = GraphicalInterface.Static.ButtonOnOff(
+            self.display_surf, (170, 500),
+            main_folder + "/StaticSource/button_play.png",
+            main_folder + "/StaticSource/button_play_over.png",
+            main_folder + "/StaticSource/button_pause_over.png",
+            main_folder + "/StaticSource/button_pause.png")
+        self.button_tick = GraphicalInterface.Static.ButtonEvent(
+            tick_function,
+            self.display_surf, (270, 500),
+            main_folder + "/StaticSource/button_tick.png",
+            main_folder + "/StaticSource/button_tick_over.png",
+            main_folder + "/StaticSource/button_tick_click.png")
+        self.button_month = GraphicalInterface.Static.ButtonEvent(
+            month_function,
+            self.display_surf, (370, 500),
+            main_folder + "/StaticSource/button_month.png",
+            main_folder + "/StaticSource/button_month_over.png",
+            main_folder + "/StaticSource/button_month_click.png")
+        self.button_year = GraphicalInterface.Static.ButtonEvent(
+            year_function,
+            self.display_surf, (470, 500),
+            main_folder + "/StaticSource/button_year.png",
+            main_folder + "/StaticSource/button_year_over.png",
+            main_folder + "/StaticSource/button_year_click.png")
 
         self.population_graph = GraphicalInterface.Static.Graph(self.display_surf, (820, 0), [3.5, 3])
 
-        self.adjust_scale_scrollbar = GraphicalInterface.Static.ScrollBar(
+        self.scrollbar_adjust_scale = GraphicalInterface.Static.ScrollBar(
             self.display_surf, (870, 300),
-            main_folder + "/StaticSource/adjust_scale_scrollbar_base.png",
-            main_folder + "/StaticSource/adjust_scale_scrollbar_cursor.png")
+            main_folder + "/StaticSource/scrollbar_base_adjust_scale.png",
+            main_folder + "/StaticSource/scrollbar_cursor_adjust_scale.png")
+        self.scrollbar_adjust_offset = GraphicalInterface.Static.ScrollBar(
+            self.display_surf, (870, 350),
+            main_folder + "/StaticSource/scrollbar_base_adjust_scale.png",
+            main_folder + "/StaticSource/scrollbar_cursor_adjust_scale.png")
 
         self.data = None
 
     def on_event(self, event):
         self.camera.on_event(event)
+        self.button_play_pause.on_event(event)
         self.button_tick.on_event(event)
         self.button_month.on_event(event)
         self.button_year.on_event(event)
-        self.adjust_scale_scrollbar.on_event(event)
+        self.scrollbar_adjust_scale.on_event(event)
+        self.scrollbar_adjust_offset.on_event(event)
 
     def draw(self):
         self.display_surf.fill(RGBColors.White)
         self.camera.scene_surface.fill(RGBColors.Green)
         self.grid.draw()
         self.camera.draw()
+        self.button_play_pause.draw()
         self.button_tick.draw()
         self.button_month.draw()
         self.button_year.draw()
         self.population_graph.draw(self.data)
-        self.adjust_scale_scrollbar.draw()
+        self.scrollbar_adjust_scale.draw()
+        self.scrollbar_adjust_offset.draw()
 
     def update_population_graph_data(self, data):
         self.data = data
@@ -76,8 +92,8 @@ class GUI:
 if __name__ == "__main__":
     gui = GUI()
     clock = pygame.time.Clock()
-    data = {"Banana": {"x": [], "y": [], "style": "b"},
-            "Potato": {"x": [], "y": [], "style": "g"}}
+    data = {"Banana": {"x": [], "y": [], "style": "b", "orient": ""},
+            "Potato": {"x": [], "y": [], "style": "g", "orient": ""}}
 
     while True:  # main game loop
         data["Banana"]["x"].append(pygame.time.get_ticks() / 1000)

@@ -28,7 +28,6 @@ class RGBColors:
 
 class Button:
     def __init__(self,
-                 linked_function,
                  display_surface: pygame.display,
                  position: (int, int),
                  path_to_base_image: str,
@@ -36,8 +35,6 @@ class Button:
                  path_to_pressed_image: str = None,
                  # button_description: str = None
                  ):
-        self.linked_function = linked_function
-
         self.display_surface = display_surface
         self.position = position
 
@@ -81,6 +78,66 @@ class Button:
                 and self.button_rectObj.top < coordinates[1] - + self.position[1] < self.button_rectObj.bottom:
             return True
         return False
+
+
+class ButtonOnOff(Button):
+    def __init__(self,
+                 display_surface: pygame.display,
+                 position: (int, int),
+                 path_to_off_image: str,
+                 path_to_over_image_off: str = None,
+                 path_to_over_image_on: str = None,
+                 path_to_on_image: str = None,
+                 # button_description: str = None
+                 ):
+        super().__init__(display_surface, position,
+                         path_to_base_image=path_to_off_image,
+                         path_to_pressed_image=path_to_on_image)
+        self.surface_over_on = pygame.image.load(path_to_over_image_on)
+        self.surface_over_off = pygame.image.load(path_to_over_image_off)
+
+    def on_event(self, event):
+        if event.type == MOUSEMOTION:
+            if self.coordinate_is_over_button(pygame.mouse.get_pos()):
+                self.over = True
+            else:
+                self.over = False
+
+        if event.type == MOUSEBUTTONDOWN and self.over and not self.pressed:
+            self.pressed = True
+        elif event.type == MOUSEBUTTONDOWN and self.over and self.pressed:
+            self.pressed = False
+
+    def draw(self):
+        if self.over \
+                and (self.surface_over_off is not None) \
+                and not self.pressed:
+            self.display_surface.blit(self.surface_over_off, self.position)
+        elif self.over \
+                and (self.surface_over_on is not None) \
+                and self.pressed:
+            self.display_surface.blit(self.surface_over_on, self.position)
+        elif self.pressed and self.surface_pressed is not None:
+            self.display_surface.blit(self.surface_pressed, self.position)
+        else:
+            self.display_surface.blit(self.surface_base, self.position)
+
+    def get_state(self):
+        return self.pressed
+
+
+class ButtonEvent(Button):
+    def __init__(self,
+                 linked_function,
+                 display_surface: pygame.display,
+                 position: (int, int),
+                 path_to_base_image: str,
+                 path_to_over_image: str = None,
+                 path_to_pressed_image: str = None,
+                 # button_description: str = None
+                 ):
+        self.linked_function = linked_function
+        super().__init__(display_surface, position, path_to_base_image, path_to_over_image, path_to_pressed_image)
 
     def on_event(self, event, function_args=[]):
         if event.type == MOUSEMOTION:
@@ -198,14 +255,20 @@ if __name__ == "__main__":
     pygame.display.set_caption('Static elements test')
     DISPLAYSURF.fill(RGBColors.White)
 
-    def button_clicked():
-        print(f"String")
+    def button_clicked(buttonState: bool):
+        print(f"On/off button is {buttonState}")
 
-    button1 = Button(button_clicked,
-                     DISPLAYSURF, (30, 30),
-                     "./StaticSource/Button1_not_pressed.png",
-                     "./StaticSource/Button1_over.png",
-                     "./StaticSource/Button1_pressed.png")
+    button1 = ButtonEvent(button_clicked,
+                          DISPLAYSURF, (30, 30),
+                          "./StaticSource/Button1_not_pressed.png",
+                          "./StaticSource/Button1_over.png",
+                          "./StaticSource/Button1_pressed.png")
+
+    button2 = ButtonOnOff(DISPLAYSURF, (300, 30),
+                          "./StaticSource/Button1_not_pressed.png",
+                          "./StaticSource/Button1_over.png",
+                          "./StaticSource/Button1_over.png",
+                          "./StaticSource/Button1_pressed.png")
 
     scrollbar1 = ScrollBar(DISPLAYSURF, (120, 120),
                            "./StaticSource/Scrollbar_base.png",
@@ -213,8 +276,8 @@ if __name__ == "__main__":
 
     graph1 = Graph(DISPLAYSURF, (300, 300), [3, 3])
 
-    data = {"Banana": {"x": [], "y": [], "style": "b"},
-            "Potato": {"x": [], "y": [], "style": "g"}}
+    data = {"Banana": {"x": [], "y": [], "style": "b", "orient": ""},
+            "Potato": {"x": [], "y": [], "style": "g", "orient": ""}}
 
     while True:  # main game loop
         data["Banana"]["x"].append(pygame.time.get_ticks()/1000)
@@ -226,10 +289,12 @@ if __name__ == "__main__":
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-            button1.on_event(event, [])
+            button1.on_event(event, [button2.get_state()])
+            button2.on_event(event)
             scrollbar1.on_event(event)
         DISPLAYSURF.fill(RGBColors.White)
         button1.draw()
+        button2.draw()
         scrollbar1.draw()
         graph1.draw(data)
         pygame.display.update()
