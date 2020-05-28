@@ -21,7 +21,8 @@ class SimulationCycle:
 
     def __init__(self, forest=None,
                  initial_tick=0, initial_month=0, initial_year=0,
-                 imported_population_history=default_population_history):
+                 imported_population_history=default_population_history,
+                 print_to_console: bool = False):
         self.population_history = imported_population_history
         self.forest = forest
         self.current_year = initial_year
@@ -35,14 +36,16 @@ class SimulationCycle:
             self.tick_count = max(imported_population_history["Ticks"])
             self.max_population = max(imported_population_history["MonthMax"])
 
+        self.print_to_console = print_to_console
+
     def initialize_forest(self, height=15, width=15, init_default_options=default_forest_initialization):
         self.forest = Forest.Forest(height, width, init_default_options)
 
-        # Display the generated forest
-        self.display_current_time()
-        self.forest.display_grid()
-        OutputUtilities.PrintPrefabs.population()
-        OutputUtilities.PrintPrefabs.resources()
+        if self.print_to_console:
+            self.display_current_time()
+            self.forest.display_grid()
+            OutputUtilities.PrintPrefabs.population()
+            OutputUtilities.PrintPrefabs.resources()
         self.update_population_history(is_year=True)
 
     def update_population_history(self, is_month=False, is_year=False):
@@ -82,10 +85,10 @@ class SimulationCycle:
             living_being.move()
             living_being.kill()
 
-        self.update_population_history()
-
         self.tick_count += 1
         self.current_tick += 1
+        self.update_population_history()
+
         if self.current_tick >= self.default_ticks_per_month:
             self.current_tick = 0
             self.__advance_month()
@@ -135,7 +138,7 @@ class SimulationCycle:
     def advance_to_next_tick(self, display: bool = True):
         self.__advance_tick()
 
-        if display:
+        if display and self.print_to_console:
             self.display_current_time()
             self.forest.display_grid()
             OutputUtilities.PrintPrefabs.population()
@@ -145,14 +148,14 @@ class SimulationCycle:
         for tick in range(self.current_tick, self.default_ticks_per_month):
             self.advance_to_next_tick(display=False)
 
-        if display:
+        if display and self.print_to_console:
             self.display_grid_and_info()
 
     def advance_to_next_year(self, display: bool = True):
         for month in range(self.current_month, self.default_months_per_year):
             self.advance_to_next_month(display=False)
 
-        if display:
+        if display and self.print_to_console:
             self.display_grid_and_info()
 
     def advance_x_years(self, years: int, display: bool = True):
@@ -168,7 +171,7 @@ class SimulationCycle:
         self.advance_x_months(end_month, False)
         self.advance_x_ticks(end_tick, False)
 
-        if display:
+        if display and self.print_to_console:
             self.display_grid_and_info()
 
     def advance_x_months(self, months: int, display=True):
@@ -182,14 +185,14 @@ class SimulationCycle:
         # Now, advance to the desired tick
         self.advance_x_ticks(end_tick, False)
 
-        if display:
+        if display and self.print_to_console:
             self.display_grid_and_info()
 
     def advance_x_ticks(self, ticks: int, display=True):
         for a in range(ticks):
             self.advance_to_next_tick(False)
 
-        if display:
+        if display and self.print_to_console:
             self.display_grid_and_info()
 
     def display_current_time(self):
@@ -208,23 +211,22 @@ class SimulationCycle:
                                        ticks_to_display: int = None,
                                        until_tick: int = None
                                        ):
-        # if until_tick was not introduced, set last tick to be the last simulated tick
-        if until_tick is None:
-            last_tick_idx = -1
-            until_tick = self.tick_count
-        else:
-            # Find the index of the last occurrence of the last tick to show in the Ticks list
-            last_tick_idx = self.index_of_last_occurrence_in_list(until_tick, self.population_history["Ticks"])
+        if ticks_to_display is None or ticks_to_display > self.tick_count:
+            ticks_to_display = self.tick_count
 
-        # If the amount of ticks to display were not specified or if it was larger than the amount of ticks existing
-        # from the beginning of the simulation to the last tick to display, set the first tick to show to be the first
-        # of the simulation
-        if ticks_to_display is None or until_tick - ticks_to_display <= 0:
-            first_tick_idx = 0
+        # if until_tick was not introduced, set last tick to be the last simulated tick.
+        if until_tick is None or until_tick > self.tick_count:
+            until_tick = self.tick_count
+        # If ticks to display > until_tick,  set until tick to ticks_to_display
+        if until_tick - ticks_to_display < 0:
+            until_tick = ticks_to_display
             first_tick = 0
         else:
             first_tick = until_tick - ticks_to_display
-            first_tick_idx = self.index_of_first_occurrence_in_list(first_tick, self.population_history["Ticks"])
+
+        # Find the index of the last occurrence of the last tick to show in the Ticks list
+        first_tick_idx = self.index_of_first_occurrence_in_list(first_tick, self.population_history["Ticks"])
+        last_tick_idx = self.index_of_last_occurrence_in_list(until_tick, self.population_history["Ticks"])
 
         # Find the first month line that should be shown
         first_tick_idx_month = self.index_of_closest_upper_value(first_tick, self.population_history["Month"]["Ticks"])

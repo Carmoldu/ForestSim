@@ -23,6 +23,8 @@ class GameCycle:
                                               os.path.dirname(sys.argv[0]) + "/GraphicalInterface"
                                               )
         self.ticks_shown = 0
+        self.until_tick = 0
+        self.in_animation = False
 
     def on_init(self):
         self._running = True
@@ -34,6 +36,8 @@ class GameCycle:
 
     def on_loop(self):
         self.gui.update_population_graph_data(self.adapt_population_history_to_plot())
+        if self.gui.button_play_pause.get_state() and not self.in_animation:
+            self.simulation.advance_to_next_tick()
 
     def on_render(self):
         self.gui.draw()
@@ -55,18 +59,26 @@ class GameCycle:
         self.on_cleanup()
 
     def adapt_population_history_to_plot(self):
-        relative_position = self.gui.adjust_scale_scrollbar.relative_position()
-        ticks = None
+        scale_scrollbar_position = self.gui.scrollbar_adjust_scale.relative_position()
+        offset_scrollbar_position = self.gui.scrollbar_adjust_offset.relative_position()
 
-        if relative_position != 0:
-            ticks = int(self.simulation.tick_count * (1 - relative_position) + self.simulation.default_months_per_year)
+        if scale_scrollbar_position != 0:
+            ticks = int(self.simulation.tick_count * (1 - scale_scrollbar_position))
+            if ticks < self.simulation.default_months_per_year:
+                ticks = self.simulation.default_months_per_year
+        else:
+            ticks = self.simulation.tick_count
 
-        if ticks != self.ticks_shown:
-            self.gui.population_graph.clear()
+        until_tick = int((self.simulation.tick_count - ticks) * offset_scrollbar_position + ticks)
 
         first_tick_idx, last_tick_idx, \
         fst_tick_idx_m, lst_tick_idx_m, \
-        fst_tick_idx_y, lst_tick_idx_y = self.simulation.get_idxs_of_population_history(ticks)
+        fst_tick_idx_y, lst_tick_idx_y = self.simulation.get_idxs_of_population_history(ticks, until_tick)
+
+        if ticks != self.ticks_shown or until_tick != self.until_tick:
+            self.gui.population_graph.clear()
+            self.ticks_shown = ticks
+            self.until_tick = until_tick
 
         years_to_plot = (self.simulation.population_history["Ticks"][last_tick_idx]
                          - self.simulation.population_history["Ticks"][first_tick_idx])/\
@@ -92,7 +104,7 @@ class GameCycle:
         if years_to_plot > 3:
             del out["Months"]
             self.gui.population_graph.clear()
-        if years_to_plot > 50:
+        if years_to_plot > 50 or fst_tick_idx_y is lst_tick_idx_y is None:
             del out["Years"]
             self.gui.population_graph.clear()
 

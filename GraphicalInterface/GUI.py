@@ -59,7 +59,8 @@ class GUI:
         self.scrollbar_adjust_offset = GraphicalInterface.Static.ScrollBar(
             self.display_surf, (870, 350),
             main_folder + "/StaticSource/scrollbar_base_adjust_scale.png",
-            main_folder + "/StaticSource/scrollbar_cursor_adjust_scale.png")
+            main_folder + "/StaticSource/scrollbar_cursor_adjust_scale.png",
+            1)
 
         self.data = None
 
