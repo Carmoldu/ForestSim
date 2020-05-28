@@ -159,7 +159,8 @@ class ScrollBar:
                  position: (int, int),
                  path_to_base_image: str,
                  path_to_cursor_image: str = None,
-                 # description: str = None
+                 # description: str = None,
+                 initial_position: float = 0
                  ):
         self.display_surface = display_surface
         self.position = position
@@ -171,9 +172,13 @@ class ScrollBar:
 
         self.cursor_surface = pygame.image.load(path_to_cursor_image)
         self.cursor_rectObj = self.cursor_surface.get_rect()
-        self.cursor_rectObj.left = self.base_rectObj.left
+
         self.cursor_rectObj.centery = self.base_rectObj.centery
+        self.cursor_rectObj.left = self.base_rectObj.left
         self.cursor_width = self.cursor_rectObj.right - self.cursor_rectObj.left
+        initial_cursor_position = self.base_rectObj.left + \
+                                  (self.base_rectObj.right - self.base_rectObj.left) * initial_position
+        self.move_cursor(initial_cursor_position)
 
         self.over_cursor = False
         self.pressed_cursor = False
@@ -272,7 +277,7 @@ if __name__ == "__main__":
 
     scrollbar1 = ScrollBar(DISPLAYSURF, (120, 120),
                            "./StaticSource/Scrollbar_base.png",
-                           "./StaticSource/Scrollbar_cursor.png")
+                           "./StaticSource/Scrollbar_cursor.png", 1)
 
     graph1 = Graph(DISPLAYSURF, (300, 300), [3, 3])
 
