@@ -22,7 +22,7 @@ class SimulationCycle:
     def __init__(self, forest=None,
                  initial_tick=0, initial_month=0, initial_year=0,
                  imported_population_history=default_population_history,
-                 print_to_console: bool = False):
+                 print_to_console: bool = True):
         self.population_history = imported_population_history
         self.forest = forest
         self.current_year = initial_year

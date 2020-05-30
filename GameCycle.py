@@ -7,7 +7,13 @@ import sys, os
 
 
 class GameCycle:
-    def __init__(self, n: int = 20, m: int = 20):
+    init_default_options = {"initial_percentage_lumberjacks": 0.1,
+                            "initial_percentage_trees": 0.5,
+                            "initial_percentage_bears": 0.02}
+
+    def __init__(self,
+                 n: int = 20, m: int = 20,
+                 init_options = init_default_options):
         self._running = True
         self._display_surf = None
         self.size = self.weight, self.height = 640, 400
@@ -15,7 +21,7 @@ class GameCycle:
         self.grid_x = n
         self.grid_y = m
         self.simulation = SimulationCycle.SimulationCycle()
-        self.simulation.initialize_forest()
+        self.simulation.initialize_forest(n, m, init_options)
         self.gui = GraphicalInterface.GUI.GUI((self.grid_x, self.grid_y),
                                               self.simulation.advance_to_next_tick,
                                               self.simulation.advance_to_next_month,
@@ -112,5 +118,8 @@ class GameCycle:
 
 
 if __name__ == "__main__":
-    game = GameCycle()
+    init_options = {"initial_percentage_lumberjacks": 0,
+                            "initial_percentage_trees": 0.5,
+                            "initial_percentage_bears": 0.02}
+    game = GameCycle(3, 3, init_options)
     game.on_execute()
