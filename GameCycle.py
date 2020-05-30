@@ -21,13 +21,13 @@ class GameCycle:
         self.grid_x = n
         self.grid_y = m
         self.simulation = SimulationCycle.SimulationCycle()
-        self.simulation.initialize_forest(n, m, init_options)
         self.gui = GraphicalInterface.GUI.GUI((self.grid_x, self.grid_y),
                                               self.simulation.advance_to_next_tick,
                                               self.simulation.advance_to_next_month,
                                               self.simulation.advance_to_next_year,
                                               os.path.dirname(sys.argv[0]) + "/GraphicalInterface"
                                               )
+        self.simulation.initialize_forest(n, m, init_options)
         self.ticks_shown = 0
         self.until_tick = 0
         self.in_animation = False
@@ -118,8 +118,8 @@ class GameCycle:
 
 
 if __name__ == "__main__":
-    init_options = {"initial_percentage_lumberjacks": 0,
+    init_options = {"initial_percentage_lumberjacks": 0.02,
                             "initial_percentage_trees": 0.5,
                             "initial_percentage_bears": 0.02}
-    game = GameCycle(3, 3, init_options)
+    game = GameCycle()
     game.on_execute()

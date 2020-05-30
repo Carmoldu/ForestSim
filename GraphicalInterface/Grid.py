@@ -11,10 +11,8 @@ class Grid:  # Grid is presented in isometric view, hence tile image should be i
                  display_surface: pygame.display,
                  grid_size: (int, int),
                  tile_img_source: str,
-                 tile_pxl_size: (int, int) = None,
-                 scroll_velocity: int = 10):
+                 tile_pxl_size: (int, int) = None):
         self.display_surface = display_surface
-        #self.zoom_surface = pygame.Surface((0, 0), self.display_surface.get_size())
 
         self.tile_source = pygame.image.load(tile_img_source)
         self.tile_rect = self.tile_source.get_rect()
@@ -34,8 +32,8 @@ class Grid:  # Grid is presented in isometric view, hence tile image should be i
         for draw_position in self.tile_positions.flatten():
             self.display_surface.blit(self.tile_source, draw_position)
 
-        for element in sorted(self.static_elements, key=lambda x: x.position):
-            element.display_surface.blit(element.surface_base, self.draw_element(element))
+        for element in sorted(self.static_elements, key=lambda x: (x.position[1], x.position[0])):
+            self.display_surface.blit(element.surface_base, self.draw_element(element))
 
     def update_tile_draw_position(self):
         draw_position = self.position
@@ -46,9 +44,10 @@ class Grid:  # Grid is presented in isometric view, hence tile image should be i
             draw_position = [row[0][0] - self.tile_width / 2, row[0][1] + self.tile_height / 2]
 
     def draw_element(self, element):
-        return (int(element.position[0] - element.width / 2
+        tile_pixel = self.tile_positions[element.position]
+        return (int(tile_pixel[0] - element.width / 2
                     + self.tile_width * (element.draw_offset[0] + 0.5)),
-                int(element.position[1] + element.height / 2
+                int(tile_pixel[1] + element.height / 2
                     - self.tile_height * (element.draw_offset[1] + 0.5)))
 
     @classmethod
@@ -56,6 +55,10 @@ class Grid:  # Grid is presented in isometric view, hence tile image should be i
         tile_pixel_size = pygame.image.load(source_image).get_rect().size
         return ((int((tiles[0]+tiles[1])/2 + 1) * tile_pixel_size[0]),
                 (int((tiles[0]+tiles[1])/2 + 1) * tile_pixel_size[1]))
+
+    @classmethod
+    def remove_element(cls, element):
+        cls.static_elements.remove(element)
 
 
 if __name__ == "__main__":

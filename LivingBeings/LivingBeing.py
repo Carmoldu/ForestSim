@@ -3,6 +3,7 @@ import warnings
 from LivingBeings.PrintColors import PrintColors as textColor
 
 import Forest
+from GraphicalInterface.IAnimate import IAnimate
 
 
 class LivingBeing:
@@ -12,7 +13,8 @@ class LivingBeing:
     can_kill = {}
 
     def __init__(self, position: (int, int),
-                 monthly_energy: int = default_monthly_energy):
+                 monthly_energy: int = default_monthly_energy,
+                 animation_object: IAnimate = None):
 
         self.age = 0
         self.position = position
@@ -20,6 +22,11 @@ class LivingBeing:
         self.energy = monthly_energy
 
         LivingBeing.alive.append(self)
+
+        self.animation = animation_object
+
+        if self.animation is not None:
+            self.animation.spawn()
 
     def recover(self):
         self.energy = self.default_monthly_energy
@@ -32,6 +39,9 @@ class LivingBeing:
         cell_to_move = cells_around[random.randint(0, len(cells_around), 1)[0]]
         LivingBeing.forest.move_living_being(self, cell_to_move)
         self.energy -= 1
+
+        if self.animation is not None:
+            self.animation.move(cell_to_move)
 
     def kill(self):
         has_killed = False
@@ -78,6 +88,9 @@ class LivingBeing:
         cls.alive.remove(living_being)
         if living_being in LivingBeing.alive:
             LivingBeing.alive.remove(living_being)
+
+        if living_being.animation is not None:
+            living_being.animation.grid.remove_element(living_being.animation)
 
     @classmethod
     def select_random_alive(cls):

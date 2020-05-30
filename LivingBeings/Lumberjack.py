@@ -1,5 +1,6 @@
 from LivingBeings import LivingBeing, Bear, Tree
 from LivingBeings.PrintColors import PrintColors as textColor
+from GraphicalInterface import IAnimate
 
 
 class Lumberjack(LivingBeing.LivingBeing):
@@ -9,7 +10,7 @@ class Lumberjack(LivingBeing.LivingBeing):
     can_kill = {}
 
     def __init__(self, position: tuple):
-        super().__init__(position, monthly_energy=self.default_monthly_energy)
+        super().__init__(position, self.default_monthly_energy, IAnimate.AnimationLumberjack(position))
         Lumberjack.alive.append(self)
 
         if not Lumberjack.can_kill:

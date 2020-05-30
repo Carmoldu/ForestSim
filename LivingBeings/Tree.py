@@ -1,6 +1,7 @@
 from LivingBeings import LivingBeing, Lumberjack, Bear
 from LivingBeings.PrintColors import PrintColors as textColor
 from numpy import random
+from GraphicalInterface import IAnimate
 
 
 class Tree(LivingBeing.LivingBeing):
@@ -9,7 +10,7 @@ class Tree(LivingBeing.LivingBeing):
     alive = []
 
     def __init__(self, position: tuple):
-        super().__init__(position, monthly_energy=self.default_monthly_energy)
+        super().__init__(position, self.default_monthly_energy, IAnimate.AnimationTree(position))
         Tree.alive.append(self)
 
     def display(self):

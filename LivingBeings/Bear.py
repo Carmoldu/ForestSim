@@ -1,5 +1,6 @@
 from LivingBeings import LivingBeing, Lumberjack, Tree
 from LivingBeings.PrintColors import PrintColors as textColor
+from GraphicalInterface import IAnimate
 
 
 class Bear(LivingBeing.LivingBeing):
@@ -9,7 +10,7 @@ class Bear(LivingBeing.LivingBeing):
     can_kill = {}
 
     def __init__(self, position: tuple):
-        super().__init__(position, monthly_energy=self.default_monthly_energy)
+        super().__init__(position, self.default_monthly_energy, IAnimate.AnimationBear(position))
         Bear.alive.append(self)
 
         if not Bear.can_kill:
@@ -28,7 +29,7 @@ class Bear(LivingBeing.LivingBeing):
 
     @classmethod
     def introduce_or_expel(cls):
-        if cls.kills > 0:
+        if cls.kills > 0.2*len(Lumberjack.Lumberjack.alive):
             expelled_bear = cls.select_random_alive()
             print(f"Bear at {expelled_bear.position} has been expelled")
             cls.died(expelled_bear)

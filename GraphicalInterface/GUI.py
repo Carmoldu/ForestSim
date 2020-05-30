@@ -3,6 +3,7 @@ import GraphicalInterface.Camera
 import GraphicalInterface.Grid
 import GraphicalInterface.Static
 from GraphicalInterface.Static import RGBColors
+from GraphicalInterface.IAnimate import IAnimate
 
 
 class GUI:
@@ -13,6 +14,7 @@ class GUI:
                  year_function=None,
                  main_folder="."
                  ):
+        IAnimate.main_folder = main_folder
         pygame.init()
         self.display_surf = pygame.display.set_mode((1200, 600))
 
@@ -24,6 +26,7 @@ class GUI:
                                                        )
 
         self.grid = GraphicalInterface.Grid.Grid(self.camera.scene_surface, grid_size, main_folder + '/Grid/tile.png')
+        IAnimate.set_grid(self.grid)
 
         self.button_play_pause = GraphicalInterface.Static.ButtonOnOff(
             self.display_surf, (170, 500),
