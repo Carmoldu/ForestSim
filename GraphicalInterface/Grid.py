@@ -5,6 +5,8 @@ from GraphicalInterface.Static import RGBColors
 
 
 class Grid:  # Grid is presented in isometric view, hence tile image should be isometric too
+    static_elements = []
+
     def __init__(self,
                  display_surface: pygame.display,
                  grid_size: (int, int),
@@ -32,6 +34,9 @@ class Grid:  # Grid is presented in isometric view, hence tile image should be i
         for draw_position in self.tile_positions.flatten():
             self.display_surface.blit(self.tile_source, draw_position)
 
+        for element in sorted(self.static_elements, key=lambda x: x.position):
+            element.display_surface.blit(element.surface_base, self.draw_element(element))
+
     def update_tile_draw_position(self):
         draw_position = self.position
         for row_idx, row in enumerate(self.tile_positions):
@@ -39,6 +44,12 @@ class Grid:  # Grid is presented in isometric view, hence tile image should be i
                 self.tile_positions[row_idx, tile_idx] = draw_position
                 draw_position = [draw_position[0] + self.tile_width / 2, draw_position[1] + self.tile_height / 2]
             draw_position = [row[0][0] - self.tile_width / 2, row[0][1] + self.tile_height / 2]
+
+    def draw_element(self, element):
+        return (int(element.position[0] - element.width / 2
+                    + self.tile_width * (element.draw_offset[0] + 0.5)),
+                int(element.position[1] + element.height / 2
+                    - self.tile_height * (element.draw_offset[1] + 0.5)))
 
     @classmethod
     def compute_grid_pixel_size(cls, tiles: (int, int), source_image: str):
